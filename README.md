@@ -11,3 +11,7 @@ Screen Capture
 ---
 
 ![alt tag](https://raw.github.com/Wayou/HTML5_Audio_Visualizer/master/sources/screencapture.png)
+
+Change
+---
+- Support play audio from url

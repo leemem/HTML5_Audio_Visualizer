@@ -39,6 +39,7 @@ Visualizer.prototype = {
     _addEventListner: function() {
         var that = this,
             audioInput = document.getElementById('uploadedFile'),
+            startPlayBtn = document.getElementById('loadAudioBtn'),
             dropContainer = document.getElementsByTagName("canvas")[0];
         //listen the file upload
         audioInput.onchange = function() {
@@ -59,6 +60,9 @@ Visualizer.prototype = {
                 that._start();
             };
         };
+        startPlayBtn.addEventListener("click",function() {
+            that._start2();
+        });
         //listen the drag & drop
         dropContainer.addEventListener("dragenter", function() {
             document.getElementById('fileWrapper').style.opacity = 1;
@@ -118,6 +122,37 @@ Visualizer.prototype = {
         //assign the file to the reader
         this._updateInfo('Starting read the file', true);
         fr.readAsArrayBuffer(file);
+    },
+    _start2: function() {
+        var that = this,
+            url = document.getElementById("audioUrl").value;
+
+        var xhr = null;
+        if(window.XMLHttpRequest){
+            xhr = new XMLHttpRequest();
+        }else if(window.ActiveXObject) {
+            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        if(!url){
+            alert("Please input correct audio url");
+            return;
+        }
+
+        xhr.responseType='arraybuffer';
+        xhr.open("GET",url,true);
+        xhr.onload = function(){
+            var audioContext = that.audioContext;
+            that._updateInfo('Decoding the audio', true);
+            audioContext.decodeAudioData(xhr.response, function(buffer){
+                that._updateInfo('Decode succussfully,start the visualizer', true);
+                that._visualize(audioContext, buffer);
+            }, function(e) {
+                that._updateInfo('!Fail to decode the file', false);
+                console.error(e);
+            });
+        }
+        xhr.send(null);
     },
     _visualize: function(audioContext, buffer) {
         var audioBufferSouceNode = audioContext.createBufferSource(),
